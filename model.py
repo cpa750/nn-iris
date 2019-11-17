@@ -1,7 +1,6 @@
 import torch
-from torch import nn
+from torch import nn, sigmoid
 import pandas as pd
-import torch.nn.functional as F
 
 class Model(nn.Module):
     """
@@ -14,10 +13,12 @@ class Model(nn.Module):
 
         self.hidden = nn.Linear(4, 3)
         # TODO: 3 might not be the correct number of hidden nodes
-        self.output = nn.Linear(3, 1)
+        self.output = nn.Linear(3, 3)
 
-    def feed_forward(self, x):
+    def forward(self, x):
         x = self.hidden(x)
-        x = F.sigmoid(x)
+        x = sigmoid(x)
         x = self.output(x)
+
+        return x
 

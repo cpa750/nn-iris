@@ -10,11 +10,14 @@ print(dataset.shape)
 print(dataset.head(10))
 
 dataset.hist()
-plt.show()
+#plt.show()
 
 scatter_matrix(dataset)
-plt.show()
+#plt.show()
 
 array = dataset.values
 X, Y = array[:, :4], array[:, 4]
+print(array[0, 4])
+print(array[50, 4])
+print(array[149, 4])
 
