@@ -3,13 +3,13 @@ import numpy as np
 from model import Model
 from torch import nn, optim, tensor
 from torch.utils.data import DataLoader, TensorDataset
-from torch.utils.data.sampler import SubsetRandomSampler
-from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
-from sklearn.compose import ColumnTransformer, make_column_transformer
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.compose import ColumnTransformer
 
-from tabulate import tabulate
-
-NUM_EPOCHS = 10
+LR = .1
+MOD = 5000
+MOMENTUM = .3
+NUM_EPOCHS = 50000
 
 url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/iris.csv"
 names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'class']
@@ -27,7 +27,6 @@ data_length = data.shape[0]
 
 split = int(0.8 * data_length)
 idx_list = list(range(data_length))
-train_idx, valid_idx = idx_list[split:], idx_list[:split]
 
 x_tr = tensor(data[:split, :4])
 y_tr = tensor(data[:split, 4])
@@ -43,14 +42,13 @@ valid_loader = DataLoader(valid, batch_size=150)
 m = Model()
 
 loss_function = nn.CrossEntropyLoss()
-optimizer = optim.SGD(m.parameters(), lr=.01, momentum=0.9, nesterov=True)
+optimizer = optim.SGD(m.parameters(), lr=LR, momentum=MOMENTUM, nesterov=True)
 
 for epoch in range(1, NUM_EPOCHS+1):
     m.train()
 
     train_loss, val_loss = [], []
     for data, target in train_loader:
-        print(tabulate(data))
         optimizer.zero_grad() # Setting gradients to 0
         output = m(data.float()) # feed forward
         loss = loss_function(output, target.long()) # calculating loss
@@ -64,5 +62,6 @@ for epoch in range(1, NUM_EPOCHS+1):
         loss = loss_function(output, target.long())
         val_loss.append(loss.item())
 
-    print("Epoch", epoch, "Training Loss", np.mean(train_loss), "Validation Loss", val_loss, sep=":")
+    if epoch%MOD == 0:
+        print("Epoch: ", epoch, "Training Loss: ", np.mean(train_loss), "Validation Loss: ", val_loss, sep=" ")
 
